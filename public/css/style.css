@@ -1,0 +1,37 @@
+body{
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+} 
+a{
+    text-decoration: none;
+}
+
+ul{
+    list-style: none;
+}
+
+hr{
+    width: 100%;
+}
+
+/* navbar Styling */
+
+.navbar-brand{
+    border: 1px solid black;
+    border-radius: 20%;
+    border-style: dotted;
+    padding: 5px;
+}
+
+.btndiv{
+    display: flex;
+    justify-content: right !important;
+    
+}
+
+/* index page */
+h3{
+    text-align: center;
+}
+.join-btn{
+    width: 150px;
+}
