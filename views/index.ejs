@@ -1,29 +1,52 @@
 <% layout('/layouts/boilerplate') -%>
 <h3 class="mb-2">Welcome to QuizMaster -</h3>
 <h3 class="mb-3">Ultimate Online Quiz Platform! </h3>
-<p>You ready to create, host, and play exciting quizzes? QuizMaster makes it easy for anyone to design quizzes, invite participants, and track results—all with a simple 6-digit code. Whether you're a teacher, student, or just someone who loves trivia, our platform is perfect for interactive learning and fun! </p>
-    <form action="/quiz/join" method="get" class="col-md-4 offset-5 mb-3 mt-4">
-        <button class="btn btn-dark mb-3 join-btn" id="join-btn">Join Quiz</button>
-    </form>
-    
-    <form method="get" action="/quiz/create" class="col-md-4 offset-5 mt-3 mb-3">
-        <button class="btn btn-secondary mb-3" id="create-btn" >Create Quiz</button>
-    </form>
-   <hr class="bg-secondary"> 
-    <ul class="mb-4" id="About">
-        <h5 class="mb-3">Why Choose QuizMaster?</h5>
-        <li class="mb-2">✅ Easy Quiz Creation - Design custom quizzes with multiple-choice, true/false, or open-ended questions.</li>
-        <li class="mb-2">✅ Instant Access - Share a unique 6-digit code, and participants can join without any signup.</li>
-        <li class="mb-2">✅ Live & Interactive - Host quizzes in real-time or let users take them at their own pace.</li>
-        <li class="mb-2">✅ Score Tracking - Get automatic scoring and leaderboards to see top performers.</li>
-        <li class="mb-2">✅ Mobile-Friendly - Play and create quizzes seamlessly on any device.</li>
-    </ul>
-    <hr class="bg-secondary mb-4">
-    <ul>
-        <h5 class="mb-3"> How It Works?</h5>
-        <li class="mb-2">1️⃣ Create a Quiz - Set up a quiz with your preferred question format.</li>
-        <li class="mb-2"> 2️⃣ Share the Code - Send the unique 6-digit quiz code to participants.</li>
-        <li class="mb-2"> 3️⃣ Start Playing - Players enter the code, answer questions, and see their scores instantly!</li>
-    </ul>
+<p class=" mb-4">You ready to create, host, and play exciting quizzes? QuizMaster makes it easy for anyone to design quizzes, invite participants, and track results—all with a simple 6-digit code. Whether you're a teacher, student, or just someone who loves trivia, our platform is perfect for interactive learning and fun! </p>
+<form action="/quiz/join" method="get" class="col-md-4 offset-5 mt-4">
+    <button class="btn btn-dark text-light mb-3 join-btn" id="join-btn">Join Quiz</button>
+</form>
+<div class="coin-container">
+    <lord-icon 
+    src="https://cdn.lordicon.com/bkzrrccj.json"
+    trigger="loop"
+    delay="1000"
+    stroke="light"
+    colors="primary:#4be1ec,secondary:#8930e8"
+    style="width:150px;height:150px">
+    </lord-icon>
+</div>
+<form method="get" action="/quiz/create" class="col-md-4 offset-5 mb-5">
+    <button class="btn btn-secondary mb-3" id="create-btn" >Create Quiz</button>
+</form>
+<hr class="bg-secondary">
+<div class="about-section" id="About-section">
+    <div class="doc-container">
+        <lord-icon
+        src="https://cdn.lordicon.com/ifyskbjd.json"
+        trigger="loop"
+        delay="1000"
+        stroke="light"
+        colors="primary:#4be1ec,secondary:#8930e8"
+        style="width:250px;height:250px">
+        </lord-icon>
+    </div>
+    <div class="about-details">
+        <ul class="mb-4" id="About">
+            <h5 class="mb-4">Why Choose QuizMaster?</h5>
+            <li class="mb-3"><lord-icon src="https://cdn.lordicon.com/oqdmuxru.json" colors="primary:#a866ee"trigger="loop" delay="1000" style="width:40px;height:30px"></lord-icon> Easy Quiz Creation - Design custom quizzes with multiple-choice, true/false, or open-ended questions.</li>
+            <li class="mb-3"><lord-icon src="https://cdn.lordicon.com/oqdmuxru.json" colors="primary:#a866ee" trigger="loop" delay="1000" style="width:40px;height:30px"></lord-icon> Instant Access - Share a unique 6-digit code, and participants can join without any signup.</li>
+            <li class="mb-3"><lord-icon src="https://cdn.lordicon.com/oqdmuxru.json" colors="primary:#a866ee"  trigger="loop" delay="1000" style="width:40px;height:30px"></lord-icon> Live & Interactive - Host quizzes in real-time or let users take them at their own pace.</li>
+            <li class="mb-3"><lord-icon src="https://cdn.lordicon.com/oqdmuxru.json" colors="primary:#a866ee"  trigger="loop" delay="1000" style="width:40px;height:30px"></lord-icon> Score Tracking - Get automatic scoring and leaderboards to see top performers.</li>
+            <li class="mb-3"><lord-icon src="https://cdn.lordicon.com/oqdmuxru.json" colors="primary:#a866ee" trigger="loop" delay="1000" style="width:40px;height:30px"></lord-icon> Mobile-Friendly - Play and create quizzes seamlessly on any device.</li>
+        </ul>
+        <hr class="bg-secondary mb-4">
+        <ul>
+            <h5 class="mb-3"> How It Works?</h5>
+            <li class="mb-2"> 1️⃣ Create a Quiz - Set up a quiz with your preferred question format.</li>
+            <li class="mb-2"> 2️⃣ Share the Code - Send the unique 6-digit quiz code to participants.</li>
+            <li class="mb-2"> 3️⃣ Start Playing - Players enter the code, answer questions, and see their scores instantly!</li>
+        </ul>
+    </div>
+</div> 
 
-    <h5 class="mb-4 mt-4">Join QuizMaster today and make learning fun, interactive, and engaging!</h5>
+<h5 class="mb-4 mt-4 foot">Join QuizMaster today and make learning fun, interactive, and engaging!</h5>

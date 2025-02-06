@@ -13,13 +13,24 @@ hr{
     width: 100%;
 }
 
+p{
+    line-height: 40px;
+}
+
+h5{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 700;
+}
+
+li{
+    text-align: start;
+}
+
 /* navbar Styling */
 
 .navbar-brand{
-    border: 1px solid black;
-    border-radius: 20%;
-    border-style: dotted;
-    padding: 5px;
+    position: relative;
+    top: 5px;
 }
 
 .btndiv{
@@ -28,10 +39,58 @@ hr{
     
 }
 
-/* index page */
+/* home-section*/
 h3{
     text-align: center;
 }
+
 .join-btn{
     width: 150px;
+    border-radius: 20px !important;
+    border: none !important;
 }
+
+#create-btn{
+    border-radius: 20px !important;
+    border: none !important;
+}
+
+.join-btn:hover{
+    background-color: transparent !important;
+    outline: auto !important;
+    color: black !important;
+    background: linear-gradient(#49d0da,#564cc0) !important;
+    border-radius: 20px;
+}
+
+#create-btn:hover{
+    background-color: transparent !important;
+    outline: auto !important;
+    background: linear-gradient(#49d0da,#564cc0) !important;
+    color: black;
+    border-radius: 20px;
+}
+
+.coin-container{
+    text-align: center;
+}
+
+/* about-section */
+.about-section{
+    display: flex;
+    flex-direction: row;
+}
+
+.doc-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.foot{
+    text-align: center;
+    transition: 0.3s ease;
+}
+
+/* hostquiz page */
+

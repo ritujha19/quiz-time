@@ -1,16 +1,16 @@
 <% layout('/layouts/boilerplate') -%>
-<h3>Create A Quiz </h3>
+<h3 class="mb-4">Create A Quiz </h3>
 <form id="createQuizForm">
-        <label for="title">Quiz Title:</label>
-        <input type="text" name="title" id="title" placeholder="enter a title"/>
-        <label for="description">Quiz Description:</label>
-        <textarea name="description" id="description" placeholder="enter a prefect description"></textarea>
-    <div id="questions-container">
-        <h3>Questions</h3>
+        <label for="title" class="form-label mb-2">Quiz Title:</label>
+        <input type="text" name="title" id="title" placeholder="enter a title" class="form-control mb-3"/>
+        <label for="description" class="form-label mb-2">Quiz Description:</label>
+        <textarea name="description" id="description" class="form-control mb-3" placeholder="enter a prefect description"></textarea>
+    <div id="questions-container" class="mb-3 mt-4">
+        <h5>Questions:</h5>
     </div>
-
-    <button type="button" onclick="addQuestion()"> + Add Questions</button>
-    <button type="submit">Sumbit </button>
+    <button type="button" onclick="addQuestion()" class="btn bg-primary-subtle border border-primary-subtle rounded-3 btn-sm mb-4 mt-2"> + Add Questions</button>
+    <br>
+    <button type="submit" class="btn btn-success">Sumbit </button>
     <h3 id="quizCodeMessage" style="display: none;"></h3>
 </form>
 <script src="/js/createQuiz.js"></script>
