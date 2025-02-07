@@ -32,9 +32,23 @@ document.getElementById("createQuizForm").addEventListener("submit", async funct
         if (result.success) {
             document.getElementById("quizCodeMessage").innerText = `Quiz Created! Code: ${result.code}`;
             document.getElementById("quizCodeMessage").style.display = "block";
+            //show quiz button
+            let showBtn = document.getElementById("showQuiz");
+            showBtn.style.display="block";
+            showBtn.addEventListener("click",
+                async()=>{
+                    try{
+                        let quizResponse = await fetch(`/quiz/${result.quizId}`);
+                        // const quizData = await quizResponse.save();
+                        
+                    } catch(error){
+                        console.log("error fetching quiz:", error);
+                        alert("failed to load quiz");
+                    };
+                });
         } else {
             alert(result.message || "Error creating quiz.");
-        }
+        };
     } catch (error) {
         console.error("❌ Fetch Error:", error);
         alert("Server error. Check the console for details.");
@@ -42,7 +56,7 @@ document.getElementById("createQuizForm").addEventListener("submit", async funct
 });
 
 // Function to add a new question to the form
-function addQuestion() {
+function  addQuestion(){
     // Validate if the previous question is completed
     if (questions.length > 0) {
         let lastQuestion = questions[questions.length - 1];

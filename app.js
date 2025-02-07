@@ -4,7 +4,7 @@ const app = express();
 const path = require("path");
 const ejsMate = require("ejs-mate");
 const methodOverride = require("method-override");
-const Quiz = require("./models/quiz.js");
+const quiz = require("./routes/Quizroute.js");
 
 
 app.set("view engine","ejs");
@@ -36,28 +36,8 @@ app.get("/",(req,res)=>{
     res.render("index.ejs");
 });
 
-app.get("/quiz/create", (req,res)=>{
-    res.render("hostquiz.ejs");
-});
+app.use("/quiz", quiz);
 
-app.post("/quiz", async(req,res)=>{
-    try{
-        const {title,description, questions} = req.body;
-        console.log(req.body);
-        if(!title || !description || !questions || questions.length === 0 ){
-            return res.status(400).json({ success: false, message: "Invalid input" });
-        };
-
-        // Save quiz to database
-        const quiz = new Quiz({title, description, code: randomCode, questions});
-        let result = await quiz.save();
-        console.log(result);
-        res.status(201).json({ success: true, code: randomCode });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
-});
 app.listen(4040, ()=>{
     console.log("app is listening on port 4040");
 });
