@@ -9,7 +9,7 @@ document.getElementById("createQuizForm").addEventListener("submit", async funct
     const description = document.getElementById("description").value;
 
     // Validate inputs
-    if (!title || !description || questions.length === 0) {
+    if (!title || questions.length === 0) {
         alert("Please fill in all fields and add at least one question.");
         return;
     }
@@ -58,34 +58,35 @@ function addQuestion() {
 
     // Create question fields in the DOM
     let questionDiv = document.createElement("div");
-    questionDiv.classList.add("mb-4", "p-3", "border", "rounded"); // Bootstrap styling
+    questionDiv.classList.add("mb-3", "p-3"); // Bootstrap styling
     questionDiv.innerHTML = `
-        <label class="form-label mb-2">Question ${questionIndex + 1}:</label>
-        <input type="text" class="form-control mb-3" placeholder="Enter question" required oninput="updateQuestion(${questionIndex}, this.value)">
+        <label for="question" id="question" class="form-label mb-2">Question ${questionIndex + 1}:</label>
+        <input type="text" class="form-control mb-3 " name="question" id="question" placeholder="Enter question" required oninput="updateQuestion(${questionIndex}, this.value)">
 
-        <label class="form-label mb-2">Options:</label>
+        <label for="options" id="options" class="form-label mb-2">Options:</label>
         <div class="row mb-3">
             <div class="col-md-6 mb-2">
-                <input type="text" class="form-control" placeholder="Option 1" required oninput="updateOption(${questionIndex}, 0, this.value)">
+                <input type="text" class="form-control"name="opt1" id="opt1" placeholder="Option 1" required oninput="updateOption(${questionIndex}, 0, this.value)">
             </div>
             <div class="col-md-6 mb-2">
-                <input type="text" class="form-control" placeholder="Option 2" required oninput="updateOption(${questionIndex}, 1, this.value)">
+                <input type="text" class="form-control" name="opt2" id="opt2" placeholder="Option 2" required oninput="updateOption(${questionIndex}, 1, this.value)">
             </div>
             <div class="col-md-6 mb-2">
-                <input type="text" class="form-control" placeholder="Option 3" required oninput="updateOption(${questionIndex}, 2, this.value)">
+                <input type="text" class="form-control" name="opt3" id="opt3" placeholder="Option 3" required oninput="updateOption(${questionIndex}, 2, this.value)">
             </div>
             <div class="col-md-6 mb-2">
-                <input type="text" class="form-control" placeholder="Option 4" required oninput="updateOption(${questionIndex}, 3, this.value)">
+                <input type="text" class="form-control" name="opt4" id="opt4" placeholder="Option 4" required oninput="updateOption(${questionIndex}, 3, this.value)">
             </div>
         </div>
-
-        <label class="form-label">Correct Answer:</label>
-        <select class="form-select" onchange="updateCorrectOption(${questionIndex}, this.value)">
-            <option value="0">Option 1</option>
-            <option value="1">Option 2</option>
-            <option value="2">Option 3</option>
-            <option value="3">Option 4</option>
-        </select>
+        <div class="col-md-6 mb-3">
+          <label for="correctAnswer" id="correctAnswer" class="form-label">Correct Answer:</label>
+          <select class="form-select w-auto"  name="selectOpt" id="selectOpt" onchange="updateCorrectOption(${questionIndex}, this.value)">
+              <option value="0">Option 1</option>
+              <option value="1">Option 2</option>
+              <option value="2">Option 3</option>
+              <option value="3">Option 4</option>
+          </select>
+        </div>
     `;
 
     // Append question fields to the container
