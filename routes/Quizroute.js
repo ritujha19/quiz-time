@@ -1,12 +1,16 @@
 const express = require("express");
-const router = express.Router;
+const mongoose = require("mongoose");
+const router = express.Router();
 const Quiz = require("../models/quiz.js");
 
-router.get("/quiz/create", (req,res)=>{
-    res.render("hostquiz.ejs");
+const randomCode = `${Math.floor(100 + Math.random()* 900)}-${
+Math.floor(100 + Math.random()* 900)}`;
+
+router.get("/create", (req,res)=>{
+    res.render("quizzes/hostquiz.ejs");
 });
 
-router.post("/quiz", async(req,res)=>{
+router.post("/", async(req,res)=>{
     try{
         const {title,description, questions} = req.body;
         console.log(req.body);
@@ -27,15 +31,15 @@ router.post("/quiz", async(req,res)=>{
 
 router.get("/:id",async(req,res)=>{
     try{
-        const quiz = await Quiz.findOneById(req.params.id);
+        const quiz = await Quiz.findById(req.params.id);
         if(!quiz){
             res.status(404).send("quiz is not found");
         }
-        res.render("show.ejs", { showQuiz });
+        res.render("quizzes/show.ejs", { quiz });
     } catch(error){
         console.log(error);
         res.status(500).send("Server error");
     };    
 });
 
-module.exports( router);
+module.exports = router;

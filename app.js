@@ -29,8 +29,7 @@ async function main(){
     await mongoose.connect(MONGO_URL);
 };
 
-const randomCode = `${Math.floor(100 + Math.random()* 900)}-${
-    Math.floor(100 + Math.random()* 900)}`;
+
 
 app.get("/",(req,res)=>{
     res.render("index.ejs");

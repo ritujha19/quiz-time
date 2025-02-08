@@ -35,17 +35,17 @@ document.getElementById("createQuizForm").addEventListener("submit", async funct
             //show quiz button
             let showBtn = document.getElementById("showQuiz");
             showBtn.style.display="block";
-            showBtn.addEventListener("click",
-                async()=>{
-                    try{
-                        let quizResponse = await fetch(`/quiz/${result.quizId}`);
-                        // const quizData = await quizResponse.save();
-                        
-                    } catch(error){
-                        console.log("error fetching quiz:", error);
-                        alert("failed to load quiz");
-                    };
-                });
+            // showBtn.addEventListener("click",
+            //     async()=>{
+            //         try{
+            //             let quizResponse = await fetch(`/quiz/${result.quizId}`);
+            //             const quizData = await quizResponse.text();
+            //             document.body.innerHTML= quizData;
+            //         } catch(error){
+            //             console.log("error fetching quiz:", error);
+            //             alert("failed to load quiz");
+            //         };
+            //     });
         } else {
             alert(result.message || "Error creating quiz.");
         };

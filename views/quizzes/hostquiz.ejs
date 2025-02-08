@@ -1,6 +1,6 @@
 <% layout('/layouts/boilerplate') -%>
 <h3 class="mb-4">Create A Quiz </h3>
-<form id="createQuizForm" class="offset-2">
+<form id="createQuizForm" class="offset-2 border rounded-3 bg-secondary-subtle text-dark">
         <label for="title" class="form-label mb-2">Quiz Title:</label>
         <input type="text" name="title" id="title" placeholder="enter a title" class="form-control mb-3"/>
         <label for="description" class="form-label mb-2">Quiz Description:</label>
@@ -11,8 +11,8 @@
     <button type="button" onclick="addQuestion()" class="btn bg-primary-subtle border border-primary-subtle rounded-3 btn-sm mb-4 mt-2 offset-0 "> + Add Questions</button>
     <br>
     <button type="submit" class="btn btn-success offset-0">Sumbit </button>
-    <h3 id="quizCodeMessage" style="display: none;" class="offset-2"></h3>
-    <button type="button" id="showQuiz" style="display: none;">show</button>
+    <h4 id="quizCodeMessage" style="display: none;" class="offset-2"></h4>
+    <a href="/quiz/<%=quiz._id %>"></a><button type="button" id="showQuiz" style="display: none;">show</button>
 </form>
 <script src="/js/createQuiz.js"></script>
 
