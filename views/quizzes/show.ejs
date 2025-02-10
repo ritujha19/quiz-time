@@ -1,11 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <% for()
-</body>
-</html>
+<% layout('/layouts/boilerplate') -%>
+    <h2 class="mb-4 text-uppercase font-monospace text-center"><%= quiz.title %></h2>
+    <p class="mb-4 text-capitalize font-monospace text-center text-break text-wrap" id="description"><%= quiz.description %></p>
+    <ul>
+        <% quiz.questions.forEach((q,index)=> { %>
+            <li style="list-style: outside;">
+                <strong>Question <%= index + 1 %> :</strong> <%= q.question %>
+                <ul>
+                    <% q.options.forEach((option,i)=>{ %>
+                        <li><%= i + 1 %> : <%= option %></li>
+                <% }); %>
+                </ul>
+                <p><strong>correct Answer:</strong> Option <%= q.correctOption +1  %></p>
+            </li>
+            <li style="list-style: none;">
+                <div class="btns mb-4">
+                    <button type="button" class="btn bg-warning-subtle border border-warning rounded-3 btn-sm">Edit</button>
+                    <button type="button" class="btn bg-danger-subtle border border-danger rounded-3 btn-sm">delete</button>
+                </div>
+            </li>
+        <% }); %>
+    </ul>
+    <form action="/quiz/<%=quiz._Id %>?_method=DELETE" method="post">
+        <button class="btn bg-danger-subtle border border-danger rounded-3 btn-sm mb-4">DELETE QUIZ</button>
+    </form>

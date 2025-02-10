@@ -97,5 +97,12 @@ h3{
 #createQuizForm{
     width: 120vh;
     padding: 30px;
-    
+}
+
+/* show page */
+
+.btns{
+    display: flex !important;
+    gap: 20px !important;
+
 }

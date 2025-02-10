@@ -29,13 +29,21 @@ async function main(){
     await mongoose.connect(MONGO_URL);
 };
 
-
-
 app.get("/",(req,res)=>{
     res.render("index.ejs");
 });
 
 app.use("/quiz", quiz);
+
+app.all("*",(req,res,next)=>{
+    next(new expressError(404,"page not found!"));
+});
+
+app.use((err,req,res,next)=>{
+    let { statusCode = 500, message = "something went wrong!"} = err;
+    res.status(statusCode).render("error.ejs",{ err });
+    // res.status(statuscode).send(message);
+});
 
 app.listen(4040, ()=>{
     console.log("app is listening on port 4040");
