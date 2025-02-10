@@ -3,22 +3,23 @@ const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 const router = express.Router();
 const Quiz = require("../models/quiz.js");
-const expressError = require("../utils/expressError.js").default;
-const wrapAsync = require("../utils/wrapAsync.js").default;
+const expressError = require("../utils/expressError.js");
+const wrapAsync = require("../utils/wrapAsync.js");
 const { quizSchema, questionSchema } = require("../schema.js");
 
 const validateQuestion = (req,res,next)=>{
-    let { error } = questionSchema.validate(req.body);
-    if(error){
-        let errMsg = error.details.map((el)=> el.message).join(",");
-        throw new expressError(400,errMsg);
-    } else{
-        next();
+    for (let i = 0; i < req.body.questions.length; i++) {
+        let { error } = questionSchema.validate(req.body.questions[i], { abortEarly: false });
+        if(error){
+            let errMsg = error.details.map((el)=> el.message).join(",");
+            throw new expressError(400,errMsg);
+        } 
     }
+    next();
 };
 
 const validateQuiz = (req,res,next)=>{
-    let { error } = quizSchema.validate(req.body);
+    let { error } = quizSchema.validate(req.body, { abortEarly: false });
     if(error){
         let errMsg = error.details.map((el)=> el.message).join(",");
         throw new expressError(400,errMsg);
@@ -34,7 +35,7 @@ router.get("/create", (req,res)=>{
     res.render("quizzes/hostquiz.ejs");
 });
 
-router.post("/", validateQuestion,validateQuiz, wrapAsync(async(req,res)=>{
+router.post("/", validateQuiz, wrapAsync(async(req,res)=>{
         const {title,description, questions} = req.body;
         console.log(req.body);
         if(!title || !questions || questions.length === 0 ){

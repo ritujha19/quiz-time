@@ -1,7 +1,6 @@
 const Joi = require("joi");
 
-
-module.exports.questionSchema = Joi.object({
+const questionSchema = Joi.object({
   question: Joi.string().required().messages({
     'string.empty': 'Question cannot be empty',
     'any.required': 'Question is required',
@@ -16,12 +15,12 @@ module.exports.questionSchema = Joi.object({
   }),
 });
 
-module.exports.quizSchema = Joi.object({
+const quizSchema = Joi.object({
     title: Joi.string().required().messages({
       'string.empty': 'Title cannot be empty',
       'any.required': 'Title is required',
     }),
-    description: Joi.string().required().messages({
+    description: Joi.string().messages({
       'string.empty': 'Description cannot be empty',
       'any.required': 'Description is required',
     }),
@@ -29,3 +28,5 @@ module.exports.quizSchema = Joi.object({
       'array.min': 'At least one question is required',
     }),
 });
+
+module.exports = { quizSchema, questionSchema };
