@@ -19,9 +19,11 @@ const validateQuestion = (req,res,next)=>{
 };
 
 const validateQuiz = (req,res,next)=>{
+   
     let { error } = quizSchema.validate(req.body, { abortEarly: false });
     if(error){
         let errMsg = error.details.map((el)=> el.message).join(",");
+        console.log(error.details);
         throw new expressError(400,errMsg);
     } else{
         next();
@@ -64,5 +66,25 @@ router.get("/:id",wrapAsync(async(req,res)=>{
 
         res.render("quizzes/show.ejs", { quiz });  
 }));
+
+router.get("/:id/:questionId/edit", async(req,res)=>{
+    let {id, questionId} = req.params;
+    const quiz = await Quiz.findById(id);
+    if (!quiz) {
+        return res.status(404).send("Quiz not found");
+    };
+
+    const question = quiz.questions.id(questionId);
+    if (!question) {
+        return res.status(404).send("Question not found");
+    };
+    res.render("quizzes/edit.ejs", { quiz, question });    
+})
+
+router.delete("/:id",async(req,res)=>{
+    let {id} = req.params;
+    console.log(id);
+    res.send("delete");
+});
 
 module.exports = router;

@@ -1,0 +1,19 @@
+<% layout('/layouts/boilerplate') -%>
+<form action="/quiz/<%= quiz._id %>/<%= question.id %>?_method= PUT" method="post" class="offset-1 border rounded-3 bg-secondary-subtle text-dark">
+<label for="question" class="form-label mb-2">Question:</label>
+<input type="text" name="question"class="form-control mb-2" value="<%= question.question %>" required>
+<label for="option" class="form-label mb-2">Options:</label>
+<% question.options.forEach((option, index) => { %>
+    <input type="text" name="options[]" value="<%= option %>" class="form-control mb-2" required>
+<% }); %>
+<label for="correctOption" class="form-label mb-2">correctOption:</label>
+<select name="correctOption" class="form-select w-auto">
+    <% for (let i = 0; i < question.options.length; i++) { %>
+        <option value="<%= i %>" <%= i === question.correctOption ? "selected" : "" %> >
+            Option <%= i + 1 %>
+        </option>
+    <% } %>
+</select>
+
+<button type="submit" class="btn bg-success-subtle btn-sm border border-success rounded-3 mb-3 mt-3">Save Changes</button>
+</form>

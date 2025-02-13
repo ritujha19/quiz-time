@@ -1,10 +1,17 @@
 <% layout('/layouts/boilerplate') -%>
 <h3 class="mb-4">Create A Quiz </h3>
-<form id="createQuizForm" class="offset-2 border rounded-3 bg-secondary-subtle text-dark">
+<form id="createQuizForm" class="offset-2 border rounded-3 bg-secondary-subtle text-dark needs-validation" novalidate>
+    <div class="mb-3">
         <label for="title" class="form-label mb-2">Quiz Title:</label>
-        <input type="text" name="title" id="title" placeholder="enter a title" class="form-control mb-3"/>
+        <input type="text" name="title" id="title" class="form-control mb-3" placeholder="enter a prefect title">
+        <div class="valid-feedback">
+            Good Title!
+        </div>
+    </div>
+    <div class="mb-3">
         <label for="description" class="form-label mb-2">Quiz Description:</label>
         <textarea name="description" id="description" class="form-control mb-3" placeholder="enter a prefect description"></textarea>
+    </div>
     <div id="questions-container" class="mb-3 mt-4">
         <h5>Questions:</h5>
     </div>

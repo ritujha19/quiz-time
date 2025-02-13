@@ -12,10 +12,12 @@
                 </ul>
                 <p><strong>correct Answer:</strong> Option <%= q.correctOption +1  %></p>
             </li>
-            <li style="list-style: none;">
+            <li>
                 <div class="btns mb-4">
-                    <button type="button" class="btn bg-warning-subtle border border-warning rounded-3 btn-sm">Edit</button>
-                    <button type="button" class="btn bg-danger-subtle border border-danger rounded-3 btn-sm">delete</button>
+                    <a href="/quiz/<%= quiz._id %>/<%= q._id %>/edit" class="btn bg-warning-subtle border border-warning rounded-3 btn-sm" >Edit</a>
+                    <form action="/quiz/<%= quiz._id %>/<%= q._id %>?_method=DELETE" method="post">
+                        <button type="button" class="btn bg-danger-subtle border border-danger rounded-3 btn-sm">delete</button>
+                    </form>
                 </div>
             </li>
         <% }); %>

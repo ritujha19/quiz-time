@@ -68,11 +68,13 @@ function  addQuestion(){
     questionDiv.innerHTML = `
         <label for="question" id="question" class="form-label mb-2">Question ${questionIndex + 1}:</label>
         <input type="text" class="form-control mb-3 " name="question" id="question" placeholder="Enter question" required oninput="updateQuestion(${questionIndex}, this.value)">
-
         <label for="options" id="options" class="form-label mb-2">Options:</label>
         <div class="row mb-3">
             <div class="col-md-6 mb-2">
                 <input type="text" class="form-control"name="opt1" id="opt1" placeholder="Option 1" required oninput="updateOption(${questionIndex}, 0, this.value)">
+                <div class="invalid-feedback">
+                    please enter the valid option!
+                </div>
             </div>
             <div class="col-md-6 mb-2">
                 <input type="text" class="form-control" name="opt2" id="opt2" placeholder="Option 2" required oninput="updateOption(${questionIndex}, 1, this.value)">
