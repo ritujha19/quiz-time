@@ -12,7 +12,7 @@ const validateQuestion = (req,res,next)=>{
         let { error } = questionSchema.validate(req.body.questions[i], { abortEarly: false });
         if(error){
             let errMsg = error.details.map((el)=> el.message).join(",");
-            throw new expressError(400,errMsg);
+            return next(new expressError(400,errMsg));
         } 
     }
     next();
@@ -30,6 +30,20 @@ const validateQuiz = (req,res,next)=>{
     }
 };
 
+//JOIN ROUTE
+
+router.get("/join", (req,res)=>{
+    res.render("quizzes/joinpage.ejs");
+});
+
+router.get("/showJoin", wrapAsync(async(req,res,next)=>{
+    let { code } = req.query;
+    console.log(code);
+    res.send("show");
+}));
+
+//CREATE ROUTE 
+
 const randomCode = `${Math.floor(100 + Math.random()* 900)}-${
 Math.floor(100 + Math.random()* 900)}`;
 
@@ -37,7 +51,7 @@ router.get("/create", (req,res)=>{
     res.render("quizzes/hostquiz.ejs");
 });
 
-router.post("/", validateQuiz, wrapAsync(async(req,res)=>{
+router.post("/", validateQuiz, wrapAsync(async(req,res,next)=>{
         const {title,description, questions} = req.body;
         console.log(req.body);
         if(!title || !questions || questions.length === 0 ){
@@ -47,44 +61,81 @@ router.post("/", validateQuiz, wrapAsync(async(req,res)=>{
         const quiz = new Quiz({title, description, code: randomCode, questions});
         let result = await quiz.save();
         console.log(result);
-        res.status(201).json({ success: true, code: randomCode,
+        return res.status(201).json({ success: true, code: randomCode,
         quizId: result._id,
         });
     
 }));
 
-router.get("/:id",wrapAsync(async(req,res)=>{
+router.get("/:id",wrapAsync(async(req,res,next)=>{
     let { id } = req.params;
         if(!ObjectId.isValid(id)){
-            return res.send(400).send("invalid id format");
+            return next(new expressError(400,"Invalid id format"));
         };
 
         const quiz = await Quiz.findById(id);
         if(!quiz){
-            res.status(404).send("quiz is not found");
+        return next(new expressError(404,"Quiz not found"));
         };
 
         res.render("quizzes/show.ejs", { quiz });  
 }));
 
-router.get("/:id/:questionId/edit", async(req,res)=>{
+router.get("/:id/:questionId/edit", wrapAsync(async(req,res,next)=>{
     let {id, questionId} = req.params;
     const quiz = await Quiz.findById(id);
     if (!quiz) {
-        return res.status(404).send("Quiz not found");
-    };
+       return next(new expressError(404,"Quiz not found"));
+    }
 
     const question = quiz.questions.id(questionId);
     if (!question) {
-        return res.status(404).send("Question not found");
+        return next(new expressError(404,"Question not found"));
+    }
+
+    res.render("quizzes/editquestion.ejs", { quiz, question });    
+}));
+
+//UPDATE ROUTE
+
+router.put("/:id/:questionId",wrapAsync(async(req,res,next)=>{
+    let { id, questionId} = req.params; 
+    const {question, options, correctOption } = req.body;
+    const quiz = await Quiz.findById(id);
+    if(!quiz){
+        return next(new expressError(404,"quiz not found"));
     };
-    res.render("quizzes/edit.ejs", { quiz, question });    
-})
+
+    let q = quiz.questions.id(questionId);
+    if(!q){
+        return next(new expressError(404,"question not found"));
+    };
+
+    q.question = question;
+    q.options = options;
+    q.correctOption = correctOption;
+    let result= await quiz.save();
+    // console.log(result); 
+    res.redirect(`/quiz/${id}`);
+}));
+
+//DELETE ROUTE
+
+router.delete("/:id/:questionId", wrapAsync(async(req,res,next)=>{
+    let {id, questionId} = req.params;
+    let quiz = await Quiz.findById(id);
+    if(!quiz){
+        return next(new expressError(404, "quiz not found"));
+    }
+    quiz.questions = quiz.questions.filter(q => q._id.toString() !== questionId);
+    await quiz.save();
+    res.redirect(`/quiz/${id}`);
+}));
 
 router.delete("/:id",async(req,res)=>{
     let {id} = req.params;
-    console.log(id);
-    res.send("delete");
+    let quiz = await Quiz.findByIdAndDelete(id);
+    res.redirect("/quiz/create");
 });
 
 module.exports = router;

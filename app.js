@@ -36,6 +36,8 @@ app.get("/",(req,res)=>{
     res.render("index.ejs");
 });
 
+
+
 app.use("/quiz", quiz);
 
 app.all("*",(req,res,next)=>{

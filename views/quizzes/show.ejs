@@ -16,12 +16,12 @@
                 <div class="btns mb-4">
                     <a href="/quiz/<%= quiz._id %>/<%= q._id %>/edit" class="btn bg-warning-subtle border border-warning rounded-3 btn-sm" >Edit</a>
                     <form action="/quiz/<%= quiz._id %>/<%= q._id %>?_method=DELETE" method="post">
-                        <button type="button" class="btn bg-danger-subtle border border-danger rounded-3 btn-sm">delete</button>
+                        <button type="submit" class="btn bg-danger-subtle border border-danger rounded-3 btn-sm">delete</button>
                     </form>
                 </div>
             </li>
         <% }); %>
     </ul>
-    <form action="/quiz/<%=quiz._Id %>?_method=DELETE" method="post">
-        <button class="btn bg-danger-subtle border border-danger rounded-3 btn-sm mb-4">DELETE QUIZ</button>
+    <form action="/quiz/<%=quiz._id %>?_method=DELETE" method="post">
+        <button type="submit" class="btn bg-danger-subtle border border-danger rounded-3 btn-sm mb-4">DELETE QUIZ</button>
     </form>

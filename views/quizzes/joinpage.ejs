@@ -1,0 +1,14 @@
+<% layout('/layouts/boilerplate') -%>
+<form action="/quiz/showJoin" method="get" class="offset-2 border border-secondary rounded-4 text-dark bg-secondary-subtle" id="join-form">
+    <label for="quizCode" class="form-label mb-3">Quiz Code:</label>
+    <div class="input">
+        <input type="text" name="code" id="code" class="form-control mb-4" placeholder="enter the code given by the host(Ex-976-127)" />
+        <lord-icon
+        src="https://cdn.lordicon.com/smwmetfi.json"
+        trigger="loop"
+        delay="1000"
+        style="width:100px;height:100px">
+        </lord-icon>
+    </div>
+    <button type="submit" class="btn bg-info-subtle offset-4 border border-info rounded-3 mb-2 mt-2">Join Quiz</button>
+</form>

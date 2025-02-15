@@ -39,6 +39,11 @@ li{
     
 }
 
+.err-div{
+    display: flex;
+    align-items: center;
+}
+
 /* home-section*/
 h3{
     text-align: center;
@@ -105,4 +110,18 @@ h3{
     display: flex !important;
     gap: 20px !important;
 
+}
+
+/* join page */
+#join-form{
+    width: 120vh;
+    padding: 30px;
+    font-size: 20px;
+    margin-top: 150px;
+    height: 300px;
+}
+
+#code{
+    height: 60px;
+    width: 500px;
 }
