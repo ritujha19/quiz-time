@@ -33,13 +33,18 @@ const validateQuiz = (req,res,next)=>{
 //JOIN ROUTE
 
 router.get("/join", (req,res)=>{
-    res.render("quizzes/joinpage.ejs");
+    res.render("joinQuiz-pages/joinpage.ejs");
 });
 
-router.get("/showJoin", wrapAsync(async(req,res,next)=>{
+router.get("/start", wrapAsync(async(req,res,next)=>{
     let { code } = req.query;
-    console.log(code);
-    res.send("show");
+    let quiz = await Quiz.findOne({code});
+    if(!quiz){
+        return next(new expressError(404,"Quiz not found"));
+    };
+    // console.log("quiz found", quiz);
+    // console.log(quiz.id);
+    res.render("");
 }));
 
 //CREATE ROUTE 
@@ -48,7 +53,7 @@ const randomCode = `${Math.floor(100 + Math.random()* 900)}-${
 Math.floor(100 + Math.random()* 900)}`;
 
 router.get("/create", (req,res)=>{
-    res.render("quizzes/hostquiz.ejs");
+    res.render("createQuiz-pages/hostquiz.ejs");
 });
 
 router.post("/", validateQuiz, wrapAsync(async(req,res,next)=>{
@@ -78,7 +83,7 @@ router.get("/:id",wrapAsync(async(req,res,next)=>{
         return next(new expressError(404,"Quiz not found"));
         };
 
-        res.render("quizzes/show.ejs", { quiz });  
+        res.render("createQuiz-pages/show.ejs", { quiz });  
 }));
 
 router.get("/:id/:questionId/edit", wrapAsync(async(req,res,next)=>{
@@ -93,7 +98,7 @@ router.get("/:id/:questionId/edit", wrapAsync(async(req,res,next)=>{
         return next(new expressError(404,"Question not found"));
     }
 
-    res.render("quizzes/editquestion.ejs", { quiz, question });    
+    res.render("createQuiz-pages/editquestion.ejs", { quiz, question });    
 }));
 
 //UPDATE ROUTE
