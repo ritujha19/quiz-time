@@ -1,0 +1,50 @@
+<% layout('/layouts/boilerplate') -%>
+<form action="/quiz/start" method="get" class="offset-2 border border-secondary rounded-4 text-dark bg-secondary-subtle" id="join-form">
+    <label for="quizCode" class="form-label mb-3">Quiz Code:</label>
+    <div class="input mb-2">
+        <input type="text" name="code" id="quizCode" class="form-control mb-4 border-dark-subtle" placeholder="enter the code given by the host(Ex-976-127)" required/>
+        <lord-icon
+        src="https://cdn.lordicon.com/smwmetfi.json"
+        trigger="loop"
+        delay="1000"
+        style="width:100px;height:100px">
+        </lord-icon>
+    </div>
+    <label for="name" class="form-label mb-2">Your Name:</label>
+    <input class="form-control mb-4" type="text" name="name" id="playerName" required placeholder="Enter Your Name"/>
+    <label for="choose" class="form-label">Choose Your Avatar:</label>
+    <select name="profilePic" class="form-select mb-2" id="profilePic">
+        <option value="/images/fox.webp">Avatar 1 🦊</option>
+        <option value="/images/panda.webp">Avatar 2 🐼</option>
+        <option value="/images/person 2.webp">Avatar 3 🧑🏻</option>
+        <option value="/images/person 3.webp">Avatar 4 👧🏻</option>
+        <option value="/images/person 4.webp">Avatar 5 👦🏻</option>
+        <option value="/images/person1.webp">Avatar 6 👨🏻</option>
+        <option value="/images/rabbit.webp">Avatar 7 🐰</option>
+    </select>
+    <button type="submit" class="btn bg-info-subtle offset-4 border border-info rounded-3 mb-2 mt-2">Join Quiz</button>
+</form>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    document.getElementById("joinForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    let quizCode = document.getElementById("quizCode").value;
+    let playerName = document.getElementById("playerName").value;
+    let profilePic = document.getElementById("profilePic").value;
+
+    socket.emit("joinQuiz", { quizCode, playerName, profilePic });
+
+    socket.on("updatePlayers", (players) => {
+        console.log("Players in quiz:", players);
+    });
+
+    socket.on("startQuiz", () => {
+        console.log("Quiz starting now...");
+        window.location.href = `/quiz/${quizCode}`;
+    });
+});
+
+</script>
