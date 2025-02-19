@@ -13,38 +13,51 @@
     <label for="name" class="form-label mb-2">Your Name:</label>
     <input class="form-control mb-4" type="text" name="name" id="playerName" required placeholder="Enter Your Name"/>
     <label for="choose" class="form-label">Choose Your Avatar:</label>
-    <select name="profilePic" class="form-select mb-2" id="profilePic">
-        <option value="/images/fox.webp">Avatar 1 🦊</option>
-        <option value="/images/panda.webp">Avatar 2 🐼</option>
-        <option value="/images/person 2.webp">Avatar 3 🧑🏻</option>
-        <option value="/images/person 3.webp">Avatar 4 👧🏻</option>
-        <option value="/images/person 4.webp">Avatar 5 👦🏻</option>
-        <option value="/images/person1.webp">Avatar 6 👨🏻</option>
-        <option value="/images/rabbit.webp">Avatar 7 🐰</option>
-    </select>
+    <!-- Avatar Selection -->
+    <div class="container mt-3">
+        <h5>Select Your Avatar</h5>
+        <div id="selectedAvatar">
+            <img src="/images/fox.webp" class="rounded-circle" width="80" alt="Selected Avatar">
+            <p id="avatarName">Avatar 1</p>
+        </div>
+
+        <div class="swiper mySwiper">
+            <div class="slider-wrapper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide" data-avatar="/images/fox.webp" data-name="Avatar 1">
+                        <img src="/images/fox.webp" class="rounded-circle" width="80">
+                    </div>
+                    <div class="swiper-slide" data-avatar="/images/panda.webp" data-name="Avatar 2">
+                        <img src="/images/panda.webp" class="rounded-circle" width="80">
+                    </div>
+                    <div class="swiper-slide" data-avatar="/images/rabbit.webp" data-name="Avatar 3">
+                        <img src="/images/rabbit.webp" class="rounded-circle" width="80">
+                    </div>
+                    <div class="swiper-slide" data-avatar="/images/person1.webp" data-name="Avatar 4">
+                        <img src="/images/person1.webp" class="rounded-circle" width="80">
+                    </div>
+                    <div class="swiper-slide" data-avatar="/images/person 2.webp" data-name="Avatar 5">
+                        <img src="/images/person 2.webp" class="rounded-circle" width="80">
+                    </div>
+                    <div class="swiper-slide" data-avatar="/images/person 3.webp" data-name="Avatar 6">
+                        <img src="/images/person 3.webp" class="rounded-circle" width="80">
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+
+                <!-- If we need navigation buttons -->
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+            
+                <!-- If we need scrollbar -->
+                <div class="swiper-scrollbar"></div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="profilePic" name="profilePic" value="avatar1.png">
+    </div>
     <button type="submit" class="btn bg-info-subtle offset-4 border border-info rounded-3 mb-2 mt-2">Join Quiz</button>
 </form>
 
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    const socket = io();
 
-    document.getElementById("joinForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    let quizCode = document.getElementById("quizCode").value;
-    let playerName = document.getElementById("playerName").value;
-    let profilePic = document.getElementById("profilePic").value;
-
-    socket.emit("joinQuiz", { quizCode, playerName, profilePic });
-
-    socket.on("updatePlayers", (players) => {
-        console.log("Players in quiz:", players);
-    });
-
-    socket.on("startQuiz", () => {
-        console.log("Quiz starting now...");
-        window.location.href = `/quiz/${quizCode}`;
-    });
-});
-
-</script>
+<script src="public/js/joinScript.js"></script>
