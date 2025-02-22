@@ -44,7 +44,7 @@ router.get("/start", wrapAsync(async(req,res,next)=>{
     };
     // console.log("quiz found", quiz);
     // console.log(quiz.id);
-    res.render("");
+    res.render("playquiz.ejs");
 }));
 
 //CREATE ROUTE 

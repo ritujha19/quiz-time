@@ -1,10 +1,10 @@
 const express = require("express");
 const http = require("http");
-const { Server } = require("socket.io");
+const socketIo = require("socket.io");
 const mongoose = require("mongoose");
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = socketIo(server);
 const path = require("path");
 const ejsMate = require("ejs-mate");
 const methodOverride = require("method-override");
@@ -94,6 +94,10 @@ app.use((err,req,res,next)=>{
     // res.status(statuscode).send(message);
 });
 
-app.listen(4040, ()=>{
-    console.log("app is listening on port 4040");
+const PORT = process.env.PORT || 4040;
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
+// app.listen(4040, ()=>{
+//     console.log("app is listening on port 4040");
+// });

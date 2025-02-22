@@ -1,4 +1,7 @@
 <% layout('/layouts/boilerplate') -%>
+<!-- Include Swiper CSS -->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
 <form action="/quiz/start" method="get" class="offset-2 border border-secondary rounded-4 text-dark bg-secondary-subtle" id="join-form">
     <label for="quizCode" class="form-label mb-3">Quiz Code:</label>
     <div class="input mb-2">
@@ -12,48 +15,45 @@
     </div>
     <label for="name" class="form-label mb-2">Your Name:</label>
     <input class="form-control mb-4" type="text" name="name" id="playerName" required placeholder="Enter Your Name"/>
-    <label for="choose" class="form-label">Choose Your Avatar:</label>
     <!-- Avatar Selection -->
     <div class="container mt-3">
         <h5>Select Your Avatar :</h5>
-        <!-- <div id="selectedAvatar">
-            <img src="/images/fox.png" class="rounded-circle" width="100" alt="Selected Avatar">
-            <p id="avatarName">Your Avatar</p>
-        </div> -->
-
         <div class="swiper mySwiper">
-            <div class="slider-wrapper">
-                <div class="swiper-wrapper">
+            <div class="swiper-container text-center">
+                <div class="swiper-wrapper mb-3">
                     <div class="swiper-slide">
-                        <img src="/images/fox.png" class="rounded-circle" width="100" data-avatar="fox.png" data-name="Avatar 1">
+                        <img src="/images/fox.png" class="rounded-circle" width="120" data-avatar="fox.png" data-name="Avatar 1">
                     </div>
                     <div class="swiper-slide">
-                        <img src="/images/panda.png" class="rounded-circle" width="100" data-avatar="panda.png" data-name="Avatar 2">
-                    </div>
-                    <div class="swiper-slide ">
-                        <img src="/images/rabbit.png" class="rounded-circle " width="100" data-avatar="rabbit.png" data-name="Avatar 3">
+                        <img src="/images/panda.png" class="rounded-circle" width="120" data-avatar="panda.png" data-name="Avatar 2">
                     </div>
                     <div class="swiper-slide">
-                        <img src="/images/person1.png" class="rounded-circle" width="100" data-avatar="person1.png" data-name="Avatar 4">
+                        <img src="/images/rabbit.png" class="rounded-circle" width="120" data-avatar="rabbit.png" data-name="Avatar 3">
                     </div>
                     <div class="swiper-slide">
-                        <img src="/images/person 2.png" class="rounded-circle" width="100" data-avatar="person 2.png" data-name="Avatar 5">
+                        <img src="/images/person1.png" class="rounded-circle" width="120" data-avatar="person1.png" data-name="Avatar 4">
                     </div>
                     <div class="swiper-slide">
-                        <img src="/images/person 3.png" class="rounded-circle" width="100" data-avatar="person 3.png" data-name="Avatar 6">
+                        <img src="/images/person 2.png" class="rounded-circle" width="120" data-avatar="person 2.png" data-name="Avatar 5">
+                    </div>
+                    <div class="swiper-slide">
+                        <img src="/images/person 3.png" class="rounded-circle" width="120" data-avatar="person 3.png" data-name="Avatar 6">
                     </div>
                 </div>
-                <div class="swiper-pagination"></div>
+                <div class="swiper-pagination mt-3"></div>
 
                 <!-- If we need navigation buttons -->
-                <div class="swiper-slide-button swiper-button-prev"></div>
-                <div class="swiper-slide-button swiper-button-next"></div>
-        
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
             </div>
         </div>
         <input type="hidden" id="profilePic" name="profilePic">
     </div>
-    <button type="submit" class="btn bg-info-subtle offset-4 border border-info rounded-3 mb-2 mt-2">Join Quiz</button>
+    <button type="submit" class="btn bg-info-subtle offset-4 border border-info rounded-3 mb-2 mt-4">Join Quiz</button>
 </form>
 
-<script src="js/joinScript.js"></script>
+<!-- Include Swiper JS -->
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<!-- Include Socket.IO client library from CDN -->
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/joinQuiz.js"></script>
