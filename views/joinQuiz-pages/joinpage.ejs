@@ -2,7 +2,7 @@
 <!-- Include Swiper CSS -->
 <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
 
-<form action="/quiz/start" method="get" class="offset-2 border border-secondary rounded-4 text-dark bg-secondary-subtle" id="join-form">
+<form  class="offset-2 border border-secondary rounded-4 text-dark bg-secondary-subtle" id="join-form">
     <label for="quizCode" class="form-label mb-3">Quiz Code:</label>
     <div class="input mb-2">
         <input type="text" name="code" id="quizCode" class="form-control mb-4 border-dark-subtle" placeholder="enter the code given by the host(Ex-976-127)" required/>
@@ -47,7 +47,10 @@
                 <div class="swiper-button-next"></div>
             </div>
         </div>
-        <input type="hidden" id="profilePic" name="profilePic">
+        <div class="avatar-preview" id="selectedAvatarContainer">
+            <h6>Selected Avatar:</h6>
+            <img id="selectedAvatar" src="" alt="Your Avatar">
+        </div>
     </div>
     <button type="submit" class="btn bg-info-subtle offset-4 border border-info rounded-3 mb-2 mt-4">Join Quiz</button>
 </form>

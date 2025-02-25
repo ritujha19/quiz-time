@@ -31,13 +31,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Avatar selection
+    let selectedAvatar = ""; // Store the selected avatar
+
+    // Handle avatar selection
     document.querySelectorAll(".swiper-slide img").forEach((img) => {
         img.addEventListener("click", function () {
-            document.querySelectorAll(".swiper-slide img").forEach(i => i.classList.remove("selected"));
-            this.classList.add("selected");
+            // Remove border from all images
+            document.querySelectorAll(".swiper-slide img").forEach((el) => {
+                el.classList.remove("selected-avatar");
+            });
 
-            // Store selected avatar in hidden input
-            document.getElementById("profilePic").value = this.dataset.avatar;
+            // Add border to selected image
+            this.classList.add("selected-avatar");
+
+            // Store selected image
+            selectedAvatar = this.getAttribute("src");
+
+            // Display selected avatar
+            document.getElementById("selectedAvatar").src = selectedAvatar;
+            document.getElementById("selectedAvatarContainer").style.display = "block";
         });
     });
 
@@ -46,22 +58,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let quizCode = document.getElementById("quizCode").value;
         let playerName = document.getElementById("playerName").value;
-        let profilePic = document.getElementById("profilePic").value;
 
-        if (!profilePic) {
+        if (!selectedAvatar) {
             alert("Please select an avatar!");
             return;
         }
+        console.log("Joining quiz...", quizCode, playerName, selectedAvatar);
+        socket.emit("joinQuiz", { quizCode, playerName, profilePic: selectedAvatar });
 
-        socket.emit("joinQuiz", { quizCode, playerName, profilePic });
-
-        socket.on("updatePlayers", (players) => {
-            console.log("Players in quiz:", players);
+        socket.on("updatePlayers", (data) => {
+            console.log("Players in quiz:", data);
         });
 
-        socket.on("startQuiz", () => {
+        socket.on("startQuiz", (data) => {
             console.log("Quiz starting now...");
-            window.location.href = `/quiz/${quizCode}`;
+            window.location.href = `/quiz/${data.quizCode}`;
         });
     });
 

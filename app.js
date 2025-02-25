@@ -8,7 +8,7 @@ const io = socketIo(server);
 const path = require("path");
 const ejsMate = require("ejs-mate");
 const methodOverride = require("method-override");
-const quiz = require("./routes/Quizroute.js");
+const quizRoutes = require("./routes/Quizroute.js")(io);
 const expressError = require("./utils/expressError.js");
 const cors = require("cors");
 
@@ -40,49 +40,7 @@ app.get("/",(req,res)=>{
     res.render("index.ejs");
 });
 
-app.use("/quiz", quiz);
-
-const activeQuizzes = {}; // Store active quiz sessions
-
-io.on("connection", (socket) => {
-    console.log("A user connected:", socket.id);
-
-    socket.on("joinQuiz", ({ quizCode, playerName, profilePic }) => {
-        if (!activeQuizzes[quizCode]) {
-            activeQuizzes[quizCode] = { players: [], questions: [], started: false };
-        }
-
-        activeQuizzes[quizCode].players.push({ id: socket.id, name: playerName, profilePic, score: 0 });
-
-        io.to(quizCode).emit("updatePlayers", activeQuizzes[quizCode].players);
-        socket.join(quizCode);
-
-        console.log(`${playerName} joined quiz ${quizCode}`);
-
-        if (activeQuizzes[quizCode].players.length === 1) {
-            setTimeout(() => {
-                io.to(quizCode).emit("startQuiz");
-                activeQuizzes[quizCode].started = true;
-            }, 60000);
-        }
-    });
-
-    socket.on("submitAnswer", ({ quizCode, questionIndex, answer }) => {
-        let player = activeQuizzes[quizCode].players.find(p => p.id === socket.id);
-        if (player) {
-            let correctAnswer = activeQuizzes[quizCode].questions[questionIndex].correctOption;
-            if (answer === correctAnswer) {
-                player.score += 10;
-            }
-            io.to(quizCode).emit("updateLeaderboard", activeQuizzes[quizCode].players);
-        }
-    });
-
-    socket.on("disconnect", () => {
-        console.log("User disconnected:", socket.id);
-    });
-});
-
+app.use("/quiz", quizRoutes);
 
 app.all("*",(req,res,next)=>{
     next(new expressError(404,"page not found!"));
