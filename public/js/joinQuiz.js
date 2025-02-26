@@ -28,51 +28,45 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     
         console.log("Swiper initialized");
+});
+
+// Avatar selection
+let selectedAvatar = ""; // Store the selected avatar
+
+// Handle avatar selection
+document.querySelectorAll(".swiper-slide img").forEach((img) => {
+    img.addEventListener("click", function () {
+        // Remove border from all images
+        document.querySelectorAll(".swiper-slide img").forEach((el) => {
+            el.classList.remove("selected-avatar");
+        });
+
+        // Add border to selected image
+        this.classList.add("selected-avatar");
+
+        // Store selected image
+        selectedAvatar = this.getAttribute("src");
+
+        // Display selected avatar
+        document.getElementById("selectedAvatar").src = selectedAvatar;
+        document.getElementById("selectedAvatarContainer").style.display = "block";
     });
+});
 
-    // Avatar selection
-    let selectedAvatar = ""; // Store the selected avatar
+document.getElementById("join-form").addEventListener("submit", (e) => {
+    e.preventDefault();
 
-    // Handle avatar selection
-    document.querySelectorAll(".swiper-slide img").forEach((img) => {
-        img.addEventListener("click", function () {
-            // Remove border from all images
-            document.querySelectorAll(".swiper-slide img").forEach((el) => {
-                el.classList.remove("selected-avatar");
-            });
+    let quizCode = document.getElementById("quizCode").value;
+    let playerName = document.getElementById("playerName").value;
 
-            // Add border to selected image
-            this.classList.add("selected-avatar");
+    if (!selectedAvatar) {
+        alert("Please select an avatar!");
+        return;
+    }
 
-            // Store selected image
-            selectedAvatar = this.getAttribute("src");
+    console.log("📢 Emitting joinQuiz event...");
+    console.log("Joining quiz...", quizCode, playerName, selectedAvatar);
 
-            // Display selected avatar
-            document.getElementById("selectedAvatar").src = selectedAvatar;
-            document.getElementById("selectedAvatarContainer").style.display = "block";
-        });
-    });
-
-    document.getElementById("join-form").addEventListener("submit", (e) => {
-        e.preventDefault();
-
-        let quizCode = document.getElementById("quizCode").value;
-        let playerName = document.getElementById("playerName").value;
-
-        if (!selectedAvatar) {
-            alert("Please select an avatar!");
-            return;
-        }
-        console.log("Joining quiz...", quizCode, playerName, selectedAvatar);
-        socket.emit("joinQuiz", { quizCode, playerName, profilePic: selectedAvatar });
-
-        socket.on("updatePlayers", (data) => {
-            console.log("Players in quiz:", data);
-        });
-
-        socket.on("startQuiz", (data) => {
-            console.log("Quiz starting now...");
-            window.location.href = `/quiz/${data.quizCode}`;
-        });
+    window.location.href = `/quiz/${quizCode}/waiting`;
     });
 

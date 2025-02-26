@@ -34,6 +34,30 @@ router.get("/join", (req, res) => {
     res.render("joinQuiz-pages/joinpage.ejs");
 });
 
+router.get("/:quizCode/start", wrapAsync(async (req, res, next) => {
+    let { quizCode } = req.params;
+    console.log("🔍 Checking quiz for:", quizCode);
+    const quiz = await Quiz.findOne({ code: quizCode });
+
+    if (!quiz) {
+        console.log("❌ Quiz not found!");
+        return next(new expressError(404, "Quiz not found"));
+    }
+
+    console.log("✅ Quiz found:", quiz);
+    res.render("joinQuiz-pages/playquiz.ejs", { quiz });
+}));
+
+router.get("/:quizCode/waiting",wrapAsync( async(req, res, next) => {
+    let { quizCode} = req.params;
+    const quiz = await Quiz.findOne({ code: quizCode });
+
+    if (!quiz) {
+        return next(new expressError(404, "Quiz not found"));
+    }
+    res.render("joinQuiz-pages/waitingPage.ejs", { quizCode });
+}));
+
 // CREATE ROUTE
 const randomCode = `${Math.floor(100 + Math.random() * 900)}-${Math.floor(100 + Math.random() * 900)}`;
 
@@ -130,36 +154,33 @@ module.exports = function (io) {
     const activeQuizzes = {};
 
     io.on("connection", (socket) => {
-        console.log("A user connected:", socket.id);
-
+        console.log("🔗 New user connected:", socket.id);
+    
         socket.on("joinQuiz", ({ quizCode, playerName, profilePic }) => {
-            console.log(`${playerName} joined quiz: ${quizCode}`);
-
+            console.log(`📩 Received joinQuiz event: ${playerName} joined ${quizCode}`);
+    
             if (!activeQuizzes[quizCode]) {
                 activeQuizzes[quizCode] = { players: [] };
             }
-
+    
             activeQuizzes[quizCode].players.push({ playerName, profilePic, score: 0 });
-
-            // Join the socket room
-            socket.join(quizCode);
-
-            // Notify all users in the quiz room
-            io.to(quizCode).emit("updatePlayers", activeQuizzes[quizCode].players);
-        });
-
-        socket.on("startQuiz", (quizCode) => {
-            if (activeQuizzes[quizCode]) {
-                setTimeout(() => {
-                    io.to(quizCode).emit("quizStarted", { quizCode });
-                }, 1000);
+    
+            console.log("📝 Updated Active Quizzes:", activeQuizzes);
+    
+            io.emit("updatePlayers", activeQuizzes[quizCode].players);
+    
+            console.log("✅ Sending quizStarted event...");
+            if (activeQuizzes[quizCode].players.length >= 2) { // Change the condition if needed
+                console.log("Starting quiz...");
+                io.emit("quizStarted", { quizCode });
             }
         });
-
+    
         socket.on("disconnect", () => {
-            console.log("User disconnected:", socket.id);
+            console.log("❌ User disconnected:", socket.id);
         });
     });
+    
     router.post("/join", (req, res) => {
         const { quizCode, playerName, profilePic } = req.body;
         if (!quizCode || !playerName) {
