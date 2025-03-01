@@ -1,34 +1,14 @@
 <% layout('/layouts/boilerplate') -%>
-<script>
-    const socket = io();
-    const quizCode = '<%= quizCode %>';
-
-socket.on("updatePlayers", (players) => {
-    document.getElementById("playersList").innerHTML = players
-        .map(player => `<li>${player.playerName} - <img src="/avatars/${player.profilePic}" width="50"></li>`)
-        .join("");
-});
-
-socket.on("quizStarted", () => {
-    console.log("🚀 Quiz starting... Redirecting");
-    window.location.href = `/quiz/${quizCode}/start`;
-});
-
-setTimeout(() => {
-    socket.emit("startQuiz", quizCode);
-}, 60000); // 60 seconds waiting time
-</script>
 <div class="container">
-    <h3>Waiting For Players</h3>
-    <br/>
-    <h4>Quiz start in <span id="timer">60</span> seconds <lord-icon src="https://cdn.lordicon.com/mwikjdwh.json" trigger="loop" delay="500" state="loop-clock" style="width:50px;height:50px"></lord-icon></h4>
-    <ul class="playersList"></ul>
+    <h2 class="">Waiting For Players</h2>
+    <div class="clock">
+        <lord-icon src="https://cdn.lordicon.com/twpfmtiv.json" trigger="loop" delay="500" stroke="bold" style="width:150px;height:150px"></lord-icon>
+    </div>
+    <h6 id="countdownTimer" class="mb-5"> quiz to start ....</h6>
+    <h6>Players joined: </h6>
+    <ul id="playersList"></ul>
 </div>
-<script>
-    let timeLeft = 60;
-        const timer = setInterval(() => {
-            timeLeft--;
-            document.getElementById("timer").textContent = timeLeft;
-            if (timeLeft <= 0) clearInterval(timer);
-        }, 1000);
-</script>
+<!-- Include Socket.IO client library from CDN -->
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/waitingPage.js"></script>
+

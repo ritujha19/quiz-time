@@ -1,4 +1,4 @@
-const socket = io();
+// const socket = io();
 
 // Initialize Swiper
 document.addEventListener("DOMContentLoaded", () => {
