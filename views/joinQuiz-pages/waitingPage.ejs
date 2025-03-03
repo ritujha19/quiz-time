@@ -1,14 +1,20 @@
 <% layout('/layouts/boilerplate') -%>
-<div class="container">
-    <h2 class="">Waiting For Players</h2>
-    <div class="clock">
-        <lord-icon src="https://cdn.lordicon.com/twpfmtiv.json" trigger="loop" delay="500" stroke="bold" style="width:150px;height:150px"></lord-icon>
+<h2 class="text-center">Waiting For Players</h2>
+<div class="container2 mt-3">
+    <div class="text">
+        <h5 id="countdownTimer" class="mb-5"> quiz to start ....</h5>
     </div>
-    <h6 id="countdownTimer" class="mb-5"> quiz to start ....</h6>
-    <h6>Players joined: </h6>
-    <ul id="playersList"></ul>
+    <div class="clock">
+        <lord-icon src="https://cdn.lordicon.com/twpfmtiv.json" trigger="loop" delay="500" stroke="bold" style="width:200px;height:200px"></lord-icon>
+    </div>
 </div>
-<!-- Include Socket.IO client library from CDN -->
-<script src="/socket.io/socket.io.js"></script>
+<div class="list mt-5 text-center">
+    <h5>Players joined: </h5>
+    <ul id="playersList" class="text-center"></ul>
+</div>
+<script>
+    const quizCode = "<%= quizCode %>";
+    console.log("parsed quizCode: ", quizCode);
+</script>
 <script src="/js/waitingPage.js"></script>
 

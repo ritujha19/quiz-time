@@ -63,32 +63,60 @@ module.exports = function (io) {
             console.log(`${playerName} joined quiz: ${quizCode}`);
 
             if (!activeQuizzes[quizCode]) {
-                activeQuizzes[quizCode] = { players: [] };
+                activeQuizzes[quizCode] = { players: [], countdownStarted: false };
             }
 
             activeQuizzes[quizCode].players.push({ playerName, profilePic, score: 0 });
-
+            if(!activeQuizzes[quizCode].players.some(p => p.playerName === playerName)){
+                activeQuizzes[quizCode].players.push({ playerName, profilePic, socketId: socket.id, score: 0 });
+            }
             // Join the socket room
             socket.join(quizCode);
-
+            console.log(`socket ${socket.id} joined room ${quizCode}`,Array.from(socket.rooms));    
             // Notify all users in the quiz room
-            io.to(quizCode).emit("updatePlayers", activeQuizzes[quizCode].players);
+            io.to(quizCode).emit("updatePlayers", activeQuizzes[quizCode].players);         
         });
 
-        socket.on("startQuiz", (quizCode) => {
+        //rejoin quiz
+        socket.on("rejoinQuiz", ({ quizCode }) => {
+            console.log("rejoining quiz:", quizCode);
+            socket.join(quizCode);
+            if(!activeQuizzes[quizCode]){
+                console.log("No active quiz found for this code");
+                return;
+            }
+            console.log("Emitting updatePlayers event...", activeQuizzes[quizCode].players);
             if (activeQuizzes[quizCode]) {
-                let countdown = 60;
-                let timer = setInterval(() => {
-                    io.to(quizCode).emit("updateTimer", countdown);
-                    countdown--;
-                    if (countdown < 0) {
-                        clearInterval(timer);
-                        io.to(quizCode).emit("quizStarted", { quizCode });
-                    }
-                }, 1000);
+                io.to(quizCode).emit("updatePlayers", activeQuizzes[quizCode].players);
             }
         });
 
+        socket.on("startQuiz", (quizCode) => {
+            if(!activeQuizzes[quizCode]){
+                console.log("No active quiz found! cannot start quiz");
+                return;
+            }
+            if (!activeQuizzes[quizCode] || activeQuizzes[quizCode].countdownStarted){
+            
+            activeQuizzes[quizCode].countdownStarted = true;
+            let countdown = 10; // Set to 10 for quick testing
+            
+            console.log("Timer started for quiz:", quizCode);
+        
+            let timer = setInterval(() => {
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    console.log("Quiz started:", quizCode);
+                    io.to(quizCode).emit("startQuiz", { quizCode });
+                } else {
+                    console.log(`Time left for ${quizCode}: ${countdown}s`);
+                    io.to(quizCode).emit("updateTimer", countdown);
+                    countdown--;
+                }
+            }, 1000);
+        }
+        });
+                
         socket.on("disconnect", () => {
             console.log("User disconnected:", socket.id);
         });

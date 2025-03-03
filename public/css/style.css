@@ -164,9 +164,10 @@ h3{
 }
 
 /* waiting page */
-.clock{
+.container2{
     display:flex;
-    justify-content:right;
+    justify-content: space-evenly;
+    flex-direction: row-reverse;
     align-items: center;
-    padding-right: 100px ;
+    /* padding-right: 100px ; */
 }

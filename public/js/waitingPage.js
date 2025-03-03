@@ -3,26 +3,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const socket = io();
     const playersList = document.getElementById("playersList");
     const countdownTimer = document.getElementById("countdownTimer");
-    socket.on("updatePlayers", (players) => {
+    socket.on("connect", () => {
+        console.log("🚀 - Connected to server", socket.id);
+        console.log("parsed quizCode", quizCode);
+        if(!quizCode){
+            console.error("quizCode is missing! check Ejs template.");
+            return;
+        }
+        console.log("rejoining quiz:", quizCode);
         
-        playersList.innerHTML = "";
-        players.forEach((player) => {
-            let li = document.createElement("li");
-            li.innerText = `${player.name} - Avatar : ${player.profilePic}`;
-            playersList.appendChild(li);
-            console.log(playersList);
+        socket.emit("rejoinQuiz", { quizCode });
+
+        socket.on("updatePlayers", (players) => {
+            console.log("🚀 - Update players", players);
+            if(playersList){
+            playersList.innerHTML = players.map(player =>`<li class="text-center">${player.playerName}- <img src="${player.profilePic}" width="80" class="rounded-circle"></li>`).join("");
+            }
         });
-    });
 
-    socket.on("updateTimer", (time) => {
-    if(countdownTimer){
-        countdownTimer.innerText = `Quiz starts in ${time} seconds`;
-        console.log(countdownTimer);
-    }
-    });
+        socket.on("updateTimer", (time) => {
+            console.log("🚀 - Update timer:" , time);
+            if(countdownTimer){
+            countdownTimer.textContent = `Quiz starts in ${time} seconds`;
+            }
+            // console.log(countdownTimer);
+        });
 
-    socket.on("quizStarted", ({ quizCode }) => {
-        console.log("🚀 Quiz starting... Redirecting");
-        window.location.href = `/quiz/${quizCode}/start`;
+        socket.on("startQuiz", ({ quizCode }) => {
+            console.log("🚀 Quiz starting... Redirecting");
+            window.location.href = `/quiz/${quizCode}/start`;
+        });
     });
 });

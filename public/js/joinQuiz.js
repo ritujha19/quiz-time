@@ -1,4 +1,4 @@
-// const socket = io();
+const socket = io();
 
 // Initialize Swiper
 document.addEventListener("DOMContentLoaded", () => {
@@ -66,7 +66,13 @@ document.getElementById("join-form").addEventListener("submit", (e) => {
 
     console.log("📢 Emitting joinQuiz event...");
     console.log("Joining quiz...", quizCode, playerName, selectedAvatar);
+    socket.emit("joinQuiz", { quizCode, playerName, profilePic: selectedAvatar });
 
     window.location.href = `/quiz/${quizCode}/waiting`;
-    });
+});
+
+socket.on("updatePlayers", (players) => {
+    console.log("📢 updatePlayers event received...");
+    console.log("Players in the quiz:", players);
+});
 
