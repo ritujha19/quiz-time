@@ -53,70 +53,191 @@ router.post("/", validateQuiz, wrapAsync(async (req, res, next) => {
 }));
 
 module.exports = function (io) {
-    // Store active quizzes
-    const activeQuizzes = {};
+// Store active quiz sessions
+const activeQuizzes = new Map();
 
-    io.on("connection", (socket) => {
-        console.log("A user connected:", socket.id);
+io.on("connection", (socket) => {  
+    console.log("New client connected:", socket.id);  
 
-        socket.on("joinQuiz", ({ quizCode, playerName, profilePic }) => {
-            console.log(`${playerName} joined quiz: ${quizCode}`);
+    // Handle player joining quiz  
+    socket.on("joinQuiz", ({ quizCode, playerName, profilePic, checkOnly }) => {  
+        console.log(`Player ${playerName} joining quiz ${quizCode}`);  
 
-            if (!activeQuizzes[quizCode]) {
-                activeQuizzes[quizCode] = { players: [], countdownStarted: false };
-            }
+        // Initialize quiz room if doesn't exist  
+        if (!activeQuizzes.has(quizCode)) {  
+            activeQuizzes.set(quizCode, {  
+                players: [],  
+                isStarted: false,  
+                timer: null  
+            });  
+        }  
 
-            activeQuizzes[quizCode].players.push({ playerName, profilePic, score: 0 });
-            if(!activeQuizzes[quizCode].players.some(p => p.playerName === playerName)){
-                activeQuizzes[quizCode].players.push({ playerName, profilePic, socketId: socket.id, score: 0 });
-            }
-            // Join the socket room
-            socket.join(quizCode);
-            console.log(`socket ${socket.id} joined room ${quizCode}`,Array.from(socket.rooms));    
-            // Notify all users in the quiz room
-            io.to(quizCode).emit("updatePlayers", activeQuizzes[quizCode].players);         
-        });
+        const quiz = activeQuizzes.get(quizCode);  
+          
+        // Check if player name already exists in this quiz  
+       const existingPlayer = quiz.players.find(p => p.name === playerName);
+if (existingPlayer) {
+    const oldSocket = io.sockets.sockets.get(existingPlayer.id);
 
-        //rejoin quiz
-        socket.on("rejoinQuiz", ({ quizCode }) => {
-            console.log("rejoining quiz:", quizCode);
-            socket.join(quizCode);
-            if(!activeQuizzes[quizCode]){
-                console.log("No active quiz found for this code");
-                return;
-            }
-            console.log("Emitting updatePlayers event...", activeQuizzes[quizCode].players);
-            if (activeQuizzes[quizCode]) {
-                io.to(quizCode).emit("updatePlayers", activeQuizzes[quizCode].players);
-            }
-        });
+    if (oldSocket && oldSocket.connected) {
+        socket.emit("joinError", { message: "You are already in this quiz in another tab or window." });
+        return;
+    } else {
+        // Update socket ID and allow reconnection
+        console.log(`Player ${playerName} reconnecting...`);
+        existingPlayer.id = socket.id;
+        socket.join(quizCode);
+        socket.emit("joinSuccess");
+        io.to(quizCode).emit("playersUpdate", { players: quiz.players });
+        return;
+         }
+       }
+    });  
 
-        socket.on("startQuiz", (quizCode) => {
-            if(!activeQuizzes[quizCode]){
-                console.log("No active quiz found! cannot start quiz");
-                return;
-            }
-            if (!activeQuizzes[quizCode] || activeQuizzes[quizCode].countdownStarted){
-            
-            activeQuizzes[quizCode].countdownStarted = true;
-            let countdown = 10; // Set to 10 for quick testing
-            
-            console.log("Timer started for quiz:", quizCode);
-        
-            let timer = setInterval(() => {
-                if (countdown <= 0) {
-                    clearInterval(timer);
-                    console.log("Quiz started:", quizCode);
-                    io.to(quizCode).emit("startQuiz", { quizCode });
-                } else {
-                    console.log(`Time left for ${quizCode}: ${countdown}s`);
-                    io.to(quizCode).emit("updateTimer", countdown);
-                    countdown--;
-                }
-            }, 1000);
-        }
-        });
-              socket.on("disconnect", () => {
+    // Handle player rejoining quiz  
+    socket.on("rejoinQuiz", ({ quizCode, playerName, profilePic }) => {  
+        console.log(`Player attempting to rejoin quiz ${quizCode}`);  
+          
+        if (!activeQuizzes.has(quizCode)) {  
+            socket.emit("joinError", {  
+                message: "Quiz not found or has ended"  
+            });  
+            return;  
+        }   
+        const quiz = activeQuizzes.get(quizCode);  
+        // If playerName is provided, try to find and update the existing player  
+        if (playerName) {  
+            const existingPlayerIndex = quiz.players.findIndex(p => p.name === playerName);  
+              
+            if (existingPlayerIndex !== -1) {  
+                // Update the existing player with the new socket ID  
+                const oldSocketId = quiz.players[existingPlayerIndex].id;  
+                quiz.players[existingPlayerIndex].id = socket.id;  
+                  
+                // Join the socket room  
+                socket.join(quizCode);  
+                  
+                // Broadcast updated players list  
+                io.to(quizCode).emit("playersUpdate", {  
+                    players: quiz.players  
+                });  
+                  
+                console.log(`Player ${playerName} rejoined quiz ${quizCode}, replaced socket ${oldSocketId} with ${socket.id}`);  
+                  
+                // If the quiz has a timer running, send the current time  
+                if (quiz.timer && quiz.currentTime !== undefined) {  
+                    socket.emit("timerUpdate", {  
+                        timeLeft: quiz.currentTime  
+                    });
+                    return;  
+				} else {  
+                // Player name not found, but they have localStorage data  
+                // This could happen if the server restarted  
+                // Add them as a new player  
+                const player = {  
+                    id: socket.id,  
+                    name: playerName,  
+                    profilePic: profilePic,  
+                    score: 0  
+                };  
+                  
+                quiz.players.push(player);  
+                socket.join(quizCode);  
+                  
+                io.to(quizCode).emit("playersUpdate", {  
+                    players: quiz.players  
+                });  
+                  
+                console.log(`Player ${playerName} added to quiz ${quizCode} during rejoin attempt`);  
+                  
+                // If the quiz has a timer running, send the current time  
+                if (quiz.timer && quiz.currentTime !== undefined) {  
+                    socket.emit("timerUpdate", {  
+                        timeLeft: quiz.currentTime  
+                    });  
+				}
+               return;  
+            }  
+        }  
+          
+        // If we get here, either no playerName was provided or the player wasn't found  
+        // Just join the room to receive updates, but don't add as a new player  
+        socket.join(quizCode);  
+          
+        // Send current players to the rejoining socket  
+        socket.emit("playersUpdate", {  
+            players: quiz.players  
+        });  
+          
+        // If the quiz has a timer running, send the current time  
+        if (quiz.timer && quiz.currentTime !== undefined) {  
+            socket.emit("timerUpdate", {  
+                timeLeft: quiz.currentTime  
+            });  
+        }  
+          
+        console.log(`Anonymous viewer joined quiz ${quizCode}`);  
+    });  
+      
+    // Handle player explicitly leaving quiz  
+    socket.on("leaveQuiz", ({ quizCode }) => {  
+        console.log(`Player leaving quiz ${quizCode}`);  
+          
+        if (!activeQuizzes.has(quizCode)) return;  
+          
+        const quiz = activeQuizzes.get(quizCode);  
+          
+        // Remove player from quiz  
+        quiz.players = quiz.players.filter(p => p.id !== socket.id);  
+          
+        // Leave the socket room  
+        socket.leave(quizCode);  
+          
+        // If no players left, clean up the quiz  
+        if (quiz.players.length === 0) {  
+            if (quiz.timer) clearInterval(quiz.timer);  
+            activeQuizzes.delete(quizCode);  
+            console.log(`Quiz ${quizCode} ended - no players left`);  
+        } else {  
+            // Broadcast updated players list  
+            io.to(quizCode).emit("playersUpdate", {  
+                players: quiz.players  
+            });  
+        }  
+    });  
+
+    // Handle quiz start  
+    socket.on("startQuiz", ({ quizCode }) => {  
+        console.log(`Starting quiz ${quizCode}`);  
+          
+        const quiz = activeQuizzes.get(quizCode);  
+        if (!quiz || quiz.isStarted) return;  
+
+        quiz.isStarted = true;  
+        let countdown = 20; // 20 second countdown  
+        quiz.currentTime = countdown; // Track current time  
+
+        // Start countdown timer  
+        quiz.timer = setInterval(() => {  
+            countdown--;  
+            quiz.currentTime = countdown; // Update current time  
+              
+            // Broadcast timer to all players  
+            io.to(quizCode).emit("timerUpdate", {  
+                timeLeft: countdown  
+            });  
+
+            if (countdown <= 0) {  
+                clearInterval(quiz.timer);  
+                quiz.timer = null;  
+                quiz.currentTime = null;  
+                io.to(quizCode).emit("quizStart");  
+            }  
+        }, 1000);  
+    });  
+
+    // Handle player disconnect  
+    socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
 
     activeQuizzes.forEach((quiz, code) => {
@@ -135,25 +256,41 @@ module.exports = function (io) {
                 activeQuizzes.delete(code);
             }
         }
-    });
-
+       });
     // Clear player's localStorage on client-side
     socket.emit("clearLocalStorage");
+   });
 });
-    });
-
     // JOIN ROUTE
     router.get("/join", (req, res) => {
         res.render("joinQuiz-pages/joinpage.ejs");
     });
 
-    router.post("/join", (req, res) => {
-        const { quizCode, playerName, profilePic } = req.body;
-        if (!quizCode || !playerName) {
-            return new expressError(400, "Invalid input");
-        }
-        res.json({ success: true, message: "Joined the quiz" });
-    });
+    // Join quiz route  
+router.post("/join", (req, res) => {  
+    const { quizCode, playerName, profilePic } = req.body;  
+
+    if (!activeQuizzes.has(quizCode)) {  
+        return res.status(404).json({  
+            success: false,  
+            message: "Quiz not found"  
+        });  
+    }  
+
+    const quiz = activeQuizzes.get(quizCode);  
+      
+    // Check if player name already exists  
+    if (quiz.players.some(p => p.name === playerName)) {  
+        return res.status(400).json({  
+            success: false,   
+            message: "Player name already taken"  
+        });  
+    }  
+
+    res.json({  
+        success: true,  
+        quizCode  
+    });  ;
     
     router.get("/:quizCode/waiting", (req, res) => {
         let { quizCode } = req.params;
