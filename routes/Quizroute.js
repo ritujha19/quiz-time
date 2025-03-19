@@ -116,10 +116,30 @@ module.exports = function (io) {
             }, 1000);
         }
         });
-                
-        socket.on("disconnect", () => {
-            console.log("User disconnected:", socket.id);
-        });
+              socket.on("disconnect", () => {
+    console.log("Client disconnected:", socket.id);
+
+    activeQuizzes.forEach((quiz, code) => {
+        const playerIndex = quiz.players.findIndex(p => p.id === socket.id);
+        
+        if (playerIndex !== -1) {
+            const playerName = quiz.players[playerIndex].name;
+            console.log(`Removing ${playerName} from quiz ${code}`);
+            quiz.players.splice(playerIndex, 1);
+            
+            io.to(code).emit("playersUpdate", { players: quiz.players });
+
+            // If no players left, delete the quiz session
+            if (quiz.players.length === 0) {
+                if (quiz.timer) clearInterval(quiz.timer);
+                activeQuizzes.delete(code);
+            }
+        }
+    });
+
+    // Clear player's localStorage on client-side
+    socket.emit("clearLocalStorage");
+});
     });
 
     // JOIN ROUTE
