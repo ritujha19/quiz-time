@@ -98,12 +98,18 @@ socket.on("quizStart", () => {
 });  
   
 // Handle quiz ending  
-socket.on("quizEnd", () => {  
+    socket.on("clearLocalStorage", () => {
+    console.log("Clearing localStorage for this quiz");
+    localStorage.removeItem(`quiz_${quizCode}_joined`);
+    localStorage.removeItem(`quiz_${quizCode}_player`);
+});
+    
+ /*socket.on("quizEnd", () => {  
     console.log("Quiz has ended");  
     // Clear localStorage for this quiz  
     localStorage.removeItem(`quiz_${quizCode}_joined`);  
     localStorage.removeItem(`quiz_${quizCode}_player`);  
-});  
+});  */
 
 socket.on("disconnect", () => {  
     console.log("⚠️ - Disconnected from server", socket.id);  
