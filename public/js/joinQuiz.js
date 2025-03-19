@@ -53,26 +53,59 @@ document.querySelectorAll(".swiper-slide img").forEach((img) => {
     });
 });
 
-document.getElementById("join-form").addEventListener("submit", (e) => {
-    e.preventDefault();
+document.getElementById("join-form").addEventListener("submit", async (e) => {
+e.preventDefault();
 
-    let quizCode = document.getElementById("quizCode").value;
-    let playerName = document.getElementById("playerName").value;
+let quizCode = document.getElementById("quizCode").value;  
+let playerName = document.getElementById("playerName").value;  
 
-    if (!selectedAvatar) {
-        alert("Please select an avatar!");
-        return;
-    }
+if (!selectedAvatar) {  
+    alert("Please select an avatar!");  
+    return;  
+}  
 
-    console.log("📢 Emitting joinQuiz event...");
-    console.log("Joining quiz...", quizCode, playerName, selectedAvatar);
-    socket.emit("joinQuiz", { quizCode, playerName, profilePic: selectedAvatar });
+console.log("📢 Joining quiz...", quizCode, playerName, selectedAvatar);  
+  
+// Store player info in localStorage  
+const playerInfo = {  
+    name: playerName,  
+    profilePic: selectedAvatar  
+};  
+  
+// Emit joinQuiz event with a new flag to check if player can join  
+socket.emit("joinQuiz", {   
+    quizCode,   
+    playerName,   
+    profilePic: selectedAvatar,  
+    checkOnly: false  
+});  
 
-    window.location.href = `/quiz/${quizCode}/waiting`;
+// Set up event listener for join errors before redirecting  
+let joinErrorReceived = false;  
+socket.on("joinError", (data) => {
+    console.error("❌ Join Error:", data.message);
+    alert(data.message);
+    
+    // Remove stored data if quiz is not found
+    localStorage.removeItem(`quiz_${quizCode}_joined`);
+    localStorage.removeItem(`quiz_${quizCode}_player`);
+
+    window.location.href = "/quiz/join";
+});  
+  
+socket.once("joinSuccess", () => {  
+    // Save to localStorage only after confirmed success  
+    localStorage.setItem(`quiz_${quizCode}_player`, JSON.stringify(playerInfo));  
+    localStorage.setItem(`quiz_${quizCode}_joined`, "true");  
+      
+    // Redirect to waiting page  
+    window.location.href = `/quiz/${quizCode}/waiting`;  
+});
+
 });
 
 socket.on("updatePlayers", (players) => {
-    console.log("📢 updatePlayers event received...");
-    console.log("Players in the quiz:", players);
-});
+console.log("📢 updatePlayers event received...");
+console.log("Players in the quiz:", players);
+});;
 
