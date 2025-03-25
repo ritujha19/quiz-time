@@ -23,19 +23,23 @@ app.use(methodOverride("_method"));
 app.engine('ejs', ejsMate);
 app.use(cors()); 
 
-const MONGO_URL =  "mongodb://localhost:27017/quiz";
+// const MONGO_URL =  "mongodb://localhost:27017/quiz";
 
-main()
-    .then(()=>{
-        console.log("connected to DB");
-    })
-    .catch((err)=>{
-        console.log(err);
-    });
+// main()
+//     .then(()=>{
+//         console.log("connected to DB");
+//     })
+//     .catch((err)=>{
+//         console.log(err);
+//     });
 
-async function main(){
-    await mongoose.connect(MONGO_URL);
-};
+// async function main(){
+//     await mongoose.connect(MONGO_URL);
+// };
+
+mongoose.connect('mongodb+srv://ritu05491:ritu2312@myproject.chwmz.mongodb.net/?retryWrites=true&w=majority&appName=myProject')
+.then(() => console.log('✅ Connected to MongoDB Atlas'))
+.catch(err => console.error('❌ MongoDB connection error:', err));
 
 app.get("/",(req,res)=>{
     res.render("index.ejs");

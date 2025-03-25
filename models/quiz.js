@@ -9,13 +9,19 @@ const questionSchema = new Schema({
     },
     options:{
         type: [String],
-        required: true
+        required: true,
+        validate: [arrayLimit, "each question must have 4 options"]
     },
     correctOption: {
         type: Number,
         required: true,
     }
 });
+
+function arrayLimit(val){
+    return val.length === 4;
+    val.every(option => option.trim() !== "");
+}
 
 const quizSchema = new Schema({
     title: {

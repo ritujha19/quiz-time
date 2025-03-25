@@ -181,7 +181,7 @@ module.exports = function (io) {
             // If we get here, either no playerName was provided or the player wasn't found  
             // Just join the room to receive updates, but don't add as a new player  
             socket.join(quizCode);  
-              
+               
             // Send current players to the rejoining socket  
             socket.emit("playersUpdate", {  
                 players: quiz.players  
@@ -249,7 +249,9 @@ module.exports = function (io) {
                     clearInterval(quiz.timer);  
                     quiz.timer = null;  
                     quiz.currentTime = null;  
-                    io.to(quizCode).emit("quizStart");  
+                    io.to(quizCode).emit("quizStart", {  
+                        questions: quiz.questions, // Send quiz questions to clients  
+                    });  
                 }  
             }, 1000);  
         });  
@@ -312,20 +314,56 @@ module.exports = function (io) {
         });
     });
 
-    // Waiting page route
-    router.get("/:quizCode/waiting", (req, res) => {
-        let { quizCode } = req.params;
-        res.render("joinQuiz-pages/waitingPage.ejs", { quizCode });
+    router.get("/test-db/:quizCode", async (req, res) => {
+        const { quizCode } = req.params;
+        try {
+            const quiz = await Quiz.findOne({ code: quizCode });
+            if (!quiz) {
+                return res.status(404).json({ success: false, message: "Quiz not found" });
+            }
+            res.json({ success: true, quiz });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ success: false, message: "Database error" });
+        }
     });
+
+    // Waiting page route
+    router.get("/:quizCode/waiting", wrapAsync(async (req, res, next) => {
+        const { quizCode } = req.params;
+
+        // Check if the quiz is in memory
+        if (!activeQuizzes.has(quizCode)) {
+            // Fetch the quiz from MongoDB
+            const quiz = await Quiz.findOne({ code: quizCode });
+            if (!quiz) {
+                return next(new expressError(404, "Quiz not found or has ended"));
+            }
+
+            // Add the quiz to activeQuizzes
+            activeQuizzes.set(quizCode, {
+                players: [],
+                isStarted: false,
+                timer: null,
+                currentTime: null,
+                questions: quiz.questions, // Store the quiz questions
+            });
+        }
+
+        res.render("joinQuiz-pages/waitingPage.ejs", { quizCode });
+    }));
 
     // Start quiz route
     router.get("/:quizCode/start", wrapAsync(async (req, res, next) => {
-        let { quizCode } = req.params;
-        const quiz = await Quiz.findOne({ code: quizCode });
+        const { quizCode } = req.params;
+
+        // Check if the quiz is in memory
+        const quiz = activeQuizzes.get(quizCode);
         if (!quiz) {
-            return next(new expressError(404, "Quiz not found"));
+            return next(new expressError(404, "Quiz not found or has ended"));
         }
-        res.render("joinQuiz-pages/playquiz.ejs", { quiz });
+
+        res.render("joinQuiz-pages/playquiz.ejs", { questions: quiz.questions });
     }));
 
     return router;
