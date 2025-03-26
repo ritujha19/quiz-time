@@ -63,7 +63,7 @@ document.getElementById("join-form").addEventListener("submit", async (e) => {
         alert("Please select an avatar!");
         return;
     }
-
+    console.log(typeof quizCode, quizCode);
     console.log("📢 Attempting to join quiz:", quizCode, playerName, selectedAvatar);
 
     // Emit join event

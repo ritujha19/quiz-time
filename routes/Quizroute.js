@@ -52,65 +52,78 @@ router.post("/", validateQuiz, wrapAsync(async (req, res, next) => {
     });
 }));
 
+// Store active quiz sessions
+const activeQuizzes = new Map(); // Global variable
+
+    // Reload active quizzes from MongoDB when the server starts
+    async function loadActiveQuizzes() {
+        console.log("🔄 Reloading active quizzes from MongoDB...");
+        const quizzes = await Quiz.find({});
+        console.log("Quizzes:", quizzes);
+        quizzes.forEach((quiz) => {
+            console.log(`Adding quiz ${quiz.code} to activeQuizzes...`);
+            activeQuizzes.set(quiz.code, {
+                players: [],
+                isStarted: false,
+                timer: null,
+                currentTime: null,
+                questions: quiz.questions,
+            });
+            console.log("after adding quiz", activeQuizzes.size);
+        });
+        console.log(`✅ Loaded ${quizzes.length} quizzes into memory.`);
+        console.log("Active quizzes:", JSON.stringify([...activeQuizzes]));
+    }
+
+    // Call the function when the server starts
+    loadActiveQuizzes().catch((err) => console.error("❌ Error loading quizzes:", err));
+
 module.exports = function (io) {
-    // Store active quiz sessions
-    const activeQuizzes = new Map();
 
     io.on("connection", (socket) => {
         console.log("New client connected:", socket.id);
 
         // Handle player joining quiz
-        socket.on("joinQuiz", ({ quizCode, playerName, profilePic, checkOnly }) => {
-            console.log(`📩 Player ${playerName} joining quiz ${quizCode}`);
+        socket.on("joinQuiz", async ({ quizCode, playerName, profilePic }) => {
+            console.log(`Player ${playerName} attempting to join quiz ${quizCode}`);
         
-            // Initialize quiz room if it doesn't exist
+            // let quiz = await Quiz.findOne({ quizCode });
+        
+            // if (!quiz) {
+            //     socket.emit("joinError", { message: "Quiz not found or has ended." });
+            //     return;
+            // }
+        
+            // ✅ Ensure the quiz is stored in activeQuizzes
             if (!activeQuizzes.has(quizCode)) {
                 activeQuizzes.set(quizCode, {
                     players: [],
                     isStarted: false,
                     timer: null,
                 });
+                console.log("quiz not found");
+                socket.emit("joinError", { message: "Quiz not found or has ended." });
+                return;
             }
+            socket.emit("joinSuccess", { message: "Joined quiz successfully!" });
+
+            const quizData = activeQuizzes.get(quizCode);
         
-            const quiz = activeQuizzes.get(quizCode);
-        
-            // Check if player already exists
-            let existingPlayer = quiz.players.find((p) => p.name === playerName);
-        
+            // ✅ Check if player already exists
+            const existingPlayer = quizData.players.find((p) => p.name === playerName);
             if (existingPlayer) {
-                const oldSocket = io.sockets.sockets.get(existingPlayer.id);
-        
-                if (oldSocket && oldSocket.connected) {
-                    socket.emit("joinError", { message: "You are already in this quiz in another tab or window." });
-                    return;
-                } else {
-                    // Update socket ID and allow reconnection
-                    console.log(`🔄 Player ${playerName} reconnecting...`);
-                    existingPlayer.id = socket.id;
-                    socket.join(quizCode);
-        
-                    // Emit success for reconnection
-                    socket.emit("joinSuccess");
-                    console.log(`✅ ${playerName} successfully rejoined quiz ${quizCode}`);
-                    return;
-                }
+                socket.emit("joinError", { message: "You are already in this quiz." });
+                return;
             }
         
-            // 🚀 New player joining: Add them to the quiz
-            quiz.players.push({
-                id: socket.id,
-                name: playerName,
-                profilePic: profilePic,
-                score: 0,
-            });
+            // ✅ Store the player in activeQuizzes
+            quizData.players.push({ id: socket.id, name: playerName, profilePic });
         
             socket.join(quizCode);
         
-            // Emit success for new player
-            socket.emit("joinSuccess");
             console.log(`✅ ${playerName} successfully joined quiz ${quizCode}`);
         });
-
+        
         // Handle player rejoining quiz  
         socket.on("rejoinQuiz", ({ quizCode, playerName, profilePic }) => {  
             console.log(`Player attempting to rejoin quiz ${quizCode}`);  
@@ -196,7 +209,15 @@ module.exports = function (io) {
               
             console.log(`Anonymous viewer joined quiz ${quizCode}`);  
         });  
-          
+
+        socket.on("checkQuiz", ({ quizCode }) => {
+            console.log(`🔍 Checking if quiz exists: ${quizCode}`);
+            console.log("Active quizzes:", [...activeQuizzes]); // Debugging
+        
+            const quizExists = activeQuizzes.has(quizCode);
+            socket.emit("quizCheckResponse", { exists: quizExists });
+        });
+
         // Handle player explicitly leaving quiz  
         socket.on("leaveQuiz", ({ quizCode }) => {  
             console.log(`Player leaving quiz ${quizCode}`);  
@@ -281,38 +302,40 @@ module.exports = function (io) {
             socket.emit("clearLocalStorage");
         });
     });
-
+    
     // JOIN ROUTE
     router.get("/join", (req, res) => {
         res.render("joinQuiz-pages/joinpage.ejs");
     });
 
     // Join quiz route
-    router.post("/join", (req, res) => {
+    router.post("/join", wrapAsync(async(req, res, next) => {
         const { quizCode, playerName, profilePic } = req.body;
 
         if (!activeQuizzes.has(quizCode)) {
-            return res.status(404).json({
-                success: false,
-                message: "Quiz not found",
+            console.log(`🔍 Quiz ${quizCode} not in memory, checking database...`);
+            
+            // Check MongoDB
+            const dbQuiz = await Quiz.findOne({ code: quizCode });
+            if (!dbQuiz) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Quiz not found",
+                });
+            }
+        
+            // ✅ Add it to activeQuizzes
+            activeQuizzes.set(quizCode, {
+                players: [],
+                isStarted: false,
+                timer: null,
+                currentTime: null,
+                questions: dbQuiz.questions, // Store quiz questions
             });
+        
+            console.log(`✅ Quiz ${quizCode} added to activeQuizzes from database.`);
         }
-
-        const quiz = activeQuizzes.get(quizCode);
-
-        // Check if player name already exists
-        if (quiz.players.some((p) => p.name === playerName)) {
-            return res.status(400).json({
-                success: false,
-                message: "Player name already taken",
-            });
-        }
-
-        res.json({
-            success: true,
-            quizCode,
-        });
-    });
+    }));
 
     router.get("/test-db/:quizCode", async (req, res) => {
         const { quizCode } = req.params;
