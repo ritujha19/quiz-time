@@ -52,3 +52,39 @@ router.post("/", validateQuiz, wrapAsync(async (req, res, next) => {
     });
 }));
 
+router.get("/join", (req,res)=>{
+    res.render("joinQuiz-pages/joinPage.ejs");
+});
+
+router.post("/join", wrapAsync(async (req, res, next) => {
+    const { quizCode, playerName, profilePic } = req.body;
+    console.log(quizCode, playerName, profilePic);
+    if (!quizCode || !playerName) {
+        return next(new expressError(400, "Invalid input"));
+    } 
+
+    // find quiz by code
+    const quiz = await Quiz.findOne({ code: quizCode });
+    if (!quiz) {
+        return next(new expressError(404, "Quiz not found"));
+    }
+    // store player data in session
+    req.session.player= {
+        name: playerName,
+        profilePic: profilePic,
+        quizCode: quizCode,
+        score: 0,
+    };
+
+    // redirect to quiz page
+    res.redirect(`/quiz/${quizCode}/play`);
+}));
+
+router.get("/:quizCode/play", wrapAsync(async (req, res, next) => {
+    const { quizCode } = req.params;
+    const quiz = await Quiz.findOne({ code: quizCode });
+    if (!quiz) {
+        return next(new expressError(404, "Quiz not found"));
+    }
+    res.render("joinQuiz-pages/playQuiz.ejs", { quiz });
+}));    
